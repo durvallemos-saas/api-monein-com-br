@@ -22,7 +22,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Variáveis
-APP_DIR="/home/u991291448/domains/monein.com.br/api"
+APP_DIR="/home/u991291448/domains/monein.com.br/public_html/api"
 LOG_DIR="/home/u991291448/logs"
 NODE_VERSION="18"
 

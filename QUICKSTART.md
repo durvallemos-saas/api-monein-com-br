@@ -89,7 +89,7 @@ pm2 logs monein-api       # Ver logs
 pm2 status                # Ver status de todos os processos
 
 # Health check completo
-bash /home/u991291448/domains/monein.com.br/health-check.sh
+bash /home/u991291448/domains/monein.com.br/public_html/health-check.sh
 ```
 
 ---
@@ -186,10 +186,10 @@ pm2 kill
 ### Erro de permissões no servidor
 ```bash
 # Verificar proprietário dos arquivos
-ls -la /home/u991291448/domains/monein.com.br/api
+ls -la /home/u991291448/domains/monein.com.br/public_html/api
 
 # Ajustar permissões se necessário
-chmod -R 755 /home/u991291448/domains/monein.com.br/api
+chmod -R 755 /home/u991291448/domains/monein.com.br/public_html/api
 ```
 
 ---

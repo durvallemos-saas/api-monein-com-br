@@ -137,13 +137,13 @@ pm2 logs monein-api --lines 100
 /home/u991291448/
 ├── domains/
 │   └── monein.com.br/
-│       ├── public_html/     # Frontend (se houver)
-│       └── api/             # Backend (nossa API)
-│           ├── dist/        # Código compilado
-│           ├── node_modules/
-│           ├── package.json
-│           ├── package-lock.json
-│           └── .env
+│       └── public_html/
+│           └── api/         # Backend (nossa API)
+│               ├── dist/    # Código compilado
+│               ├── node_modules/
+│               ├── package.json
+│               ├── package-lock.json
+│               └── .env
 └── logs/
     └── monein-api.log       # Logs da aplicação
 ```

@@ -53,11 +53,11 @@ jobs:
           command_timeout: 30m
           script: |
             # Criar diretórios se não existirem
-            mkdir -p /home/u991291448/domains/monein.com.br/api
+            mkdir -p /home/u991291448/domains/monein.com.br/public_html/api
             mkdir -p /home/u991291448/logs
             
             # Ir para o diretório da aplicação
-            cd /home/u991291448/domains/monein.com.br/api
+            cd /home/u991291448/domains/monein.com.br/public_html/api
             
             # Fazer backup da versão anterior
             if [ -d "dist" ]; then
@@ -77,7 +77,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           source: "api/dist,api/package.json,api/package-lock.json,api/.env"
-          target: "/home/u991291448/domains/monein.com.br/api"
+          target: "/home/u991291448/domains/monein.com.br/public_html/api"
           strip_components: 1
 
       - name: Install dependencies and restart service
@@ -90,7 +90,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            cd /home/u991291448/domains/monein.com.br/api
+            cd /home/u991291448/domains/monein.com.br/public_html/api
             
             # Instalar apenas dependências de produção
             npm ci --production
