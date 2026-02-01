@@ -1,0 +1,121 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: api/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./api
+        run: npm ci
+
+      - name: Build
+        working-directory: ./api
+        run: npm run build
+
+      - name: Create .env file
+        working-directory: ./api
+        run: |
+          cat > .env << EOF
+          NODE_ENV=production
+          PORT=3000
+          PUBLIC_API_BASE=https://api.monein.com.br
+          CORS_ORIGIN=https://monein.com.br,https://www.monein.com.br
+          SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+          OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+          OPENAI_WEBHOOK_SECRET=${{ secrets.OPENAI_WEBHOOK_SECRET }}
+          EOF
+
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            # Criar diretórios se não existirem
+            mkdir -p /home/u991291448/domains/monein.com.br/api
+            mkdir -p /home/u991291448/logs
+            
+            # Ir para o diretório da aplicação
+            cd /home/u991291448/domains/monein.com.br/api
+            
+            # Fazer backup da versão anterior
+            if [ -d "dist" ]; then
+              mv dist dist.backup.$(date +%Y%m%d_%H%M%S)
+            fi
+            
+            # Limpar arquivos antigos (manter apenas últimos 3 backups)
+            ls -t dist.backup.* 2>/dev/null | tail -n +4 | xargs rm -rf
+            
+            echo "Preparado para receber arquivos..."
+
+      - name: Copy files via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          source: "api/dist,api/package.json,api/package-lock.json,api/.env"
+          target: "/home/u991291448/domains/monein.com.br/api"
+          strip_components: 1
+
+      - name: Install dependencies and restart service
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            cd /home/u991291448/domains/monein.com.br/api
+            
+            # Instalar apenas dependências de produção
+            npm ci --production
+            
+            # Verificar se PM2 está instalado
+            if ! command -v pm2 &> /dev/null; then
+              npm install -g pm2
+            fi
+            
+            # Parar aplicação antiga (se existir)
+            pm2 delete monein-api 2>/dev/null || true
+            
+            # Iniciar aplicação
+            pm2 start dist/server.js --name monein-api --log /home/u991291448/logs/monein-api.log
+            pm2 save
+            
+            # Configurar PM2 para iniciar no boot (se possível)
+            pm2 startup 2>/dev/null || true
+            
+            # Verificar status
+            pm2 status
+
+      - name: Deployment notification
+        if: always()
+        run: |
+          if [ ${{ job.status }} == 'success' ]; then
+            echo "✅ Deploy realizado com sucesso!"
+          else
+            echo "❌ Falha no deploy"
+          fi
