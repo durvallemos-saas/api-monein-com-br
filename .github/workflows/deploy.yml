@@ -90,7 +90,20 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
+            # Carregar ambiente Node.js (NVM se existir)
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            
+            # Adicionar Node.js ao PATH (locais comuns na Hostinger)
+            export PATH="/opt/alt/alt-nodejs18/root/usr/bin:$PATH"
+            export PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+            
             cd /home/u991291448/domains/monein.com.br/public_html/api
+            
+            # Verificar Node.js
+            echo "Verificando Node.js..."
+            node --version || echo "Node.js não encontrado"
+            npm --version || echo "npm não encontrado"
             
             # Instalar apenas dependências de produção
             npm ci --production
