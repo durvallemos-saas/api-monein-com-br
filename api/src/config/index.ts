@@ -37,7 +37,8 @@ interface Config {
 const config: Config = {
   port: parseInt(process.env.PORT || '443', 10),
   httpPort: parseInt(process.env.HTTP_PORT || '80', 10),
-  nodeEnv: process.env.NODE_ENV || 'development',
+  // No Vercel, force production se não especificado
+  nodeEnv: process.env.NODE_ENV || (process.env.VERCEL ? 'production' : 'development'),
   publicApiBase: process.env.PUBLIC_API_BASE || 'http://localhost:3000',
   corsOrigin: process.env.CORS_ORIGIN?.split(',').map(o => o.trim()) || ['http://localhost:5173'],
   ssl: {
