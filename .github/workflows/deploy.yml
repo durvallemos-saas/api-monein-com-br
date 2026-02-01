@@ -49,6 +49,8 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
+          timeout: 60s
+          command_timeout: 30m
           script: |
             # Criar diretórios se não existirem
             mkdir -p /home/u991291448/domains/monein.com.br/api
@@ -83,6 +85,8 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}
           port: ${{ secrets.SSH_PORT }}
+          timeout: 60s
+          command_timeout: 30m
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |

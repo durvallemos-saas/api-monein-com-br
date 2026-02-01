@@ -24,6 +24,15 @@ Clique em **"New repository secret"** e adicione cada um:
 
 ### 2️⃣ Preparar Servidor (primeira vez)
 
+**Importante:** Seu servidor pode estar bloqueando conexões SSH vindas do GitHub Actions. Se o deploy falhar com "timeout", você terá duas opções:
+
+**Opção A - Liberar IPs do GitHub Actions** (recomendado para produção):
+- Adicione os IPs do GitHub Actions no firewall do servidor
+- IPs: https://api.github.com/meta (procure por "actions")
+
+**Opção B - Deploy manual via FTP** (alternativa simples):
+- Use o script de deploy manual (veja abaixo)
+
 ```bash
 # Conectar via SSH
 ssh -p 65002 u991291448@77.37.127.18
@@ -109,6 +118,38 @@ bash /home/u991291448/domains/monein.com.br/health-check.sh
 ---
 
 ## 🆘 Troubleshooting
+
+### Deploy falha com "timeout" ou "i/o timeout"
+
+**Causa:** O servidor está bloqueando conexões SSH do GitHub Actions.
+
+**Solução A - Liberar GitHub Actions no firewall:**
+1. Obtenha os IPs do GitHub: https://api.github.com/meta
+2. No painel da Hostinger, adicione os IPs na whitelist SSH
+3. Ou desabilite temporariamente o firewall para testar
+
+**Solução B - Deploy manual via script:**
+```bash
+# No seu computador local
+cd api
+npm ci
+npm run build
+
+# Fazer upload via FTP para: /home/u991291448/domains/monein.com.br/public_html/api
+# Ferramentas: FileZilla, WinSCP, ou linha de comando
+
+# Conectar ao servidor via SSH
+ssh -p 65002 u991291448@77.37.127.18
+
+# Navegar para o diretório
+cd /home/u991291448/domains/monein.com.br/public_html/api
+
+# Instalar dependências e iniciar
+npm ci --production
+pm2 delete monein-api || true
+pm2 start dist/server.js --name monein-api
+pm2 save
+```
 
 ### Deploy não inicia no GitHub Actions
 - ✅ Verifique se todos os 9 secrets estão configurados
