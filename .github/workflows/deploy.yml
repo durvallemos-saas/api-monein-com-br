@@ -108,23 +108,25 @@ jobs:
             # Instalar apenas dependências de produção
             npm ci --production
             
-            # Verificar se PM2 está instalado
+            # Instalar PM2 localmente no projeto (sem -g)
             if ! command -v pm2 &> /dev/null; then
-              npm install -g pm2
+              echo "Instalando PM2 localmente..."
+              npm install pm2
+              export PATH="$PWD/node_modules/.bin:$PATH"
             fi
             
             # Parar aplicação antiga (se existir)
-            pm2 delete monein-api 2>/dev/null || true
+            npx pm2 delete monein-api 2>/dev/null || true
             
             # Iniciar aplicação
-            pm2 start dist/server.js --name monein-api --log /home/u991291448/logs/monein-api.log
-            pm2 save
+            npx pm2 start dist/server.js --name monein-api --log /home/u991291448/logs/monein-api.log
+            npx pm2 save
             
             # Configurar PM2 para iniciar no boot (se possível)
-            pm2 startup 2>/dev/null || true
+            npx pm2 startup 2>/dev/null || true
             
             # Verificar status
-            pm2 status
+            npx pm2 status
 
       - name: Deployment notification
         if: always()
