@@ -23,7 +23,8 @@ const logger = winston.createLogger({
   ],
 });
 
-if (config.nodeEnv === 'production') {
+// File transport apenas em ambientes não-serverless
+if (config.nodeEnv === 'production' && !process.env.VERCEL) {
   logger.add(
     new winston.transports.File({ filename: 'logs/error.log', level: 'error' })
   );
