@@ -63,10 +63,11 @@ const startServer = () => {
   // Não iniciar servidor se estiver no Vercel (serverless)
   if (process.env.VERCEL) {
     logger.info('Running in Vercel serverless environment');
+    logger.info(`Environment: ${config.nodeEnv}`);
     return;
   }
 
-  if (config.ssl.enabled && config.nodeEnv === 'production') {
+  if (config.ssl.enabled) {
     try {
       // Verificar se os certificados SSL existem
       if (!fs.existsSync(config.ssl.keyPath) || !fs.existsSync(config.ssl.certPath)) {
