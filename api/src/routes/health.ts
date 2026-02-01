@@ -12,6 +12,8 @@ router.get('/health', (_req: Request, res: Response) => {
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     environment: process.env.NODE_ENV || 'development',
+    vercel: process.env.VERCEL || 'not set',
+    vercelEnv: process.env.VERCEL_ENV || 'not set',
   });
 });
 
