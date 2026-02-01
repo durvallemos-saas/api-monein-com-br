@@ -18,12 +18,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: api/package-lock.json
 
       - name: Install dependencies
         working-directory: ./api
-        run: npm ci
+        run: npm ci --prefer-offline
 
       - name: Build
         working-directory: ./api
