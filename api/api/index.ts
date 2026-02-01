@@ -1,3 +1,6 @@
-import app from './server';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+import app from '../src/server';
 
-export default app;
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  return app(req, res);
+}
