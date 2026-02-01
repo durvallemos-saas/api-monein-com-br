@@ -7,7 +7,9 @@ module.exports = {
       exec_mode: 'cluster',
       env: {
         NODE_ENV: 'production',
-        PORT: 3000,
+        PORT: 443,
+        HTTP_PORT: 80,
+        SSL_ENABLED: 'true',
       },
       max_memory_restart: '500M',
       error_file: './logs/pm2-error.log',
